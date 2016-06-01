@@ -1,8 +1,0 @@
-com\ambuj\domain\ConfigurationProperties.class
-com\ambuj\domain\GsLookUpDetails$GsLookUpDetailsBuilder.class
-com\ambuj\util\ResourceLoadUtil.class
-com\ambuj\service\GsSpaceQueryService.class
-com\ambuj\domain\GsLookUpDetails.class
-com\ambuj\controller\QueryController.class
-com\ambuj\controller\HellowWorldController.class
-com\ambuj\service\SpaceDiscoveryService.class
