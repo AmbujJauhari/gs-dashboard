@@ -3,12 +3,14 @@ package com.ambuj.controller;
 import com.ambuj.domain.GsLookUpDetails;
 import com.ambuj.domain.SpaceQueryRestRequest;
 import com.ambuj.service.GsSpaceQueryService;
+import com.ambuj.util.SpaceDocumentConverterUtil;
 import com.gigaspaces.document.SpaceDocument;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import java.util.Map;
 
 @Controller
 public class QueryController {
@@ -31,11 +33,12 @@ public class QueryController {
     @RequestMapping(value = "query/getDataFromSpaceForType", headers = "Accept=*/*")
     public
     @ResponseBody
-    SpaceDocument[] getDataFromSpaceForType(@RequestBody SpaceQueryRestRequest spaceQueryRestRequest) {
+    List<Map<String, Object>> getDataFromSpaceForType(@RequestBody SpaceQueryRestRequest spaceQueryRestRequest) {
         String documentName = spaceQueryRestRequest.getDataType();
         String criteria = spaceQueryRestRequest.getCriteria();
         String envName = spaceQueryRestRequest.getGridName();
-        return gsSpaceQueryService.getDataFromSpaceForType(envName, documentName, criteria);
+        SpaceDocument[] spaceDocuments = gsSpaceQueryService.getDataFromSpaceForType(envName, documentName, criteria);
+        return SpaceDocumentConverterUtil.convertSpaceDocumentToMap(spaceDocuments);
     }
 
 }
