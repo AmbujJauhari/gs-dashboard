@@ -1,14 +1,17 @@
 package com.ambuj.controller;
 
 import com.ambuj.domain.GsLookUpDetails;
+import com.ambuj.domain.SpaceEntry;
 import com.ambuj.domain.SpaceQueryRestRequest;
 import com.ambuj.service.GsSpaceQueryService;
-import com.ambuj.util.SpaceDocumentConverterUtil;
-import com.gigaspaces.document.SpaceDocument;
+import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.integration.support.MutableMessage;
+import org.springframework.integration.transformer.ObjectToMapTransformer;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
@@ -30,15 +33,27 @@ public class QueryController {
         return gsSpaceQueryService.getAllDataTypesForSpace(gsLookUpDetails);
     }
 
-    @RequestMapping(value = "query/getDataFromSpaceForType", headers = "Accept=*/*")
+    @RequestMapping(value = "query/getDataFromSpaceForType", headers = "Accept=*/*", method = RequestMethod.POST)
     public
     @ResponseBody
-    List<Map<String, Object>> getDataFromSpaceForType(@RequestBody SpaceQueryRestRequest spaceQueryRestRequest) {
+    List<List<SpaceEntry>> getDataFromSpaceForType(@RequestBody SpaceQueryRestRequest spaceQueryRestRequest) throws Exception {
+        ObjectToMapTransformer objectToMapTransformer = new ObjectToMapTransformer();
         String documentName = spaceQueryRestRequest.getDataType();
         String criteria = spaceQueryRestRequest.getCriteria();
         String envName = spaceQueryRestRequest.getGridName();
-        SpaceDocument[] spaceDocuments = gsSpaceQueryService.getDataFromSpaceForType(envName, documentName, criteria);
-        return SpaceDocumentConverterUtil.convertSpaceDocumentToMap(spaceDocuments);
+        Object[] spaceDocuments = gsSpaceQueryService.getDataFromSpaceForType(envName, documentName, criteria);
+        List<List<SpaceEntry>> listsOfSpaceEntries = new ArrayList<>();
+        for (Object spaceDocument : spaceDocuments) {
+            Map<String, String> props = org.apache.commons.beanutils.BeanUtils.describe(spaceDocument);
+            List<SpaceEntry> spaceEntries = new ArrayList<>();
+            for (Map.Entry entry : props.entrySet()) {
+                SpaceEntry spaceEntry = new SpaceEntry(entry);
+                spaceEntries.add(spaceEntry);
+            }
+            listsOfSpaceEntries.add(spaceEntries);
+        }
+        System.out.println(spaceDocuments);
+        return listsOfSpaceEntries;
     }
 
 }
