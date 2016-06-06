@@ -4,9 +4,7 @@ import com.ambuj.domain.GsLookUpDetails;
 import com.ambuj.domain.SpaceEntry;
 import com.ambuj.domain.SpaceQueryRestRequest;
 import com.ambuj.service.GsSpaceQueryService;
-import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.integration.support.MutableMessage;
 import org.springframework.integration.transformer.ObjectToMapTransformer;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
@@ -36,24 +34,23 @@ public class QueryController {
     @RequestMapping(value = "query/getDataFromSpaceForType", headers = "Accept=*/*", method = RequestMethod.POST)
     public
     @ResponseBody
-    List<List<SpaceEntry>> getDataFromSpaceForType(@RequestBody SpaceQueryRestRequest spaceQueryRestRequest) throws Exception {
-        ObjectToMapTransformer objectToMapTransformer = new ObjectToMapTransformer();
+    SpaceEntry getDataFromSpaceForType(@RequestBody SpaceQueryRestRequest spaceQueryRestRequest) throws Exception {
         String documentName = spaceQueryRestRequest.getDataType();
         String criteria = spaceQueryRestRequest.getCriteria();
         String envName = spaceQueryRestRequest.getGridName();
         Object[] spaceDocuments = gsSpaceQueryService.getDataFromSpaceForType(envName, documentName, criteria);
         List<List<SpaceEntry>> listsOfSpaceEntries = new ArrayList<>();
-        for (Object spaceDocument : spaceDocuments) {
-            Map<String, String> props = org.apache.commons.beanutils.BeanUtils.describe(spaceDocument);
-            List<SpaceEntry> spaceEntries = new ArrayList<>();
-            for (Map.Entry entry : props.entrySet()) {
-                SpaceEntry spaceEntry = new SpaceEntry(entry);
-                spaceEntries.add(spaceEntry);
+        SpaceEntry spaceEntry = new SpaceEntry();
+        for (int i = 0; i < spaceDocuments.length; i++) {
+            Map<String, String> valuesMap = org.apache.commons.beanutils.BeanUtils.describe(spaceDocuments[i]);
+            if (i == 0) {
+                spaceEntry.setHeaderColumns(valuesMap.keySet());
             }
-            listsOfSpaceEntries.add(spaceEntries);
+            spaceEntry.getTableData().add(
+                    valuesMap);
         }
-        System.out.println(spaceDocuments);
-        return listsOfSpaceEntries;
+        System.out.println(spaceEntry);
+        return spaceEntry;
     }
 
 }

@@ -1,35 +1,38 @@
 package com.ambuj.domain;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 /**
  * Created by Aj on 03-06-2016.
  */
 public class SpaceEntry {
-    private String key;
-    private Object value;
+    private Set<String> headerColumns;
+    private List<Map<String, String>> tableData = new ArrayList<>();
 
-    public SpaceEntry() {
+    public Set<String> getHeaderColumns() {
+        return headerColumns;
     }
 
-    public SpaceEntry(Map.Entry<String, Object> entry) {
-        key = entry.getKey();
-        value = entry.getValue();
+    public void setHeaderColumns(Set<String> headerColumns) {
+        this.headerColumns = headerColumns;
     }
 
-    public String getKey() {
-        return key;
+    public List<Map<String, String>> getTableData() {
+        return tableData;
     }
 
-    public void setKey(String key) {
-        this.key = key;
+    public void setTableData(List<Map<String, String>> tableData) {
+        this.tableData = tableData;
     }
 
-    public Object getValue() {
-        return value;
-    }
-
-    public void setValue(Object value) {
-        this.value = value;
+    @Override
+    public String toString() {
+        return "SpaceEntry{" +
+                "headerColumns=" + headerColumns +
+                ", tableData=" + tableData +
+                '}';
     }
 }
