@@ -2,8 +2,6 @@ package com.ambuj.service;
 
 
 import com.ambuj.domain.GsLookUpDetails;
-import com.gigaspaces.document.SpaceDocument;
-import com.j_spaces.core.Constants;
 import com.j_spaces.core.IJSpace;
 import com.j_spaces.core.admin.IRemoteJSpaceAdmin;
 import com.j_spaces.core.client.SQLQuery;
@@ -33,9 +31,9 @@ public class GsSpaceQueryService {
         return typesInSpace;
     }
 
-    public SpaceDocument[] getDataFromSpaceForType(String envName, String dataType, String criteria) {
+    public Object[] getDataFromSpaceForType(String envName, String dataType, String criteria) {
         GigaSpace gigaSpace = spaceDiscoveryService.getSpace(envName);
-        SQLQuery<SpaceDocument> documentSQLQuery = new SQLQuery<>(dataType, criteria);
+        SQLQuery<Object> documentSQLQuery = new SQLQuery<>(dataType, criteria);
         return gigaSpace.readMultiple(documentSQLQuery);
     }
 }

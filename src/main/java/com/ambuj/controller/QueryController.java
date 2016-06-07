@@ -1,14 +1,17 @@
 package com.ambuj.controller;
 
 import com.ambuj.domain.GsLookUpDetails;
+import com.ambuj.domain.SpaceEntry;
 import com.ambuj.domain.SpaceQueryRestRequest;
 import com.ambuj.service.GsSpaceQueryService;
-import com.gigaspaces.document.SpaceDocument;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.integration.transformer.ObjectToMapTransformer;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 
 @Controller
 public class QueryController {
@@ -28,14 +31,26 @@ public class QueryController {
         return gsSpaceQueryService.getAllDataTypesForSpace(gsLookUpDetails);
     }
 
-    @RequestMapping(value = "query/getDataFromSpaceForType", headers = "Accept=*/*")
+    @RequestMapping(value = "query/getDataFromSpaceForType", headers = "Accept=*/*", method = RequestMethod.POST)
     public
     @ResponseBody
-    SpaceDocument[] getDataFromSpaceForType(@RequestBody SpaceQueryRestRequest spaceQueryRestRequest) {
+    SpaceEntry getDataFromSpaceForType(@RequestBody SpaceQueryRestRequest spaceQueryRestRequest) throws Exception {
         String documentName = spaceQueryRestRequest.getDataType();
         String criteria = spaceQueryRestRequest.getCriteria();
         String envName = spaceQueryRestRequest.getGridName();
-        return gsSpaceQueryService.getDataFromSpaceForType(envName, documentName, criteria);
+        Object[] spaceDocuments = gsSpaceQueryService.getDataFromSpaceForType(envName, documentName, criteria);
+        List<List<SpaceEntry>> listsOfSpaceEntries = new ArrayList<>();
+        SpaceEntry spaceEntry = new SpaceEntry();
+        for (int i = 0; i < spaceDocuments.length; i++) {
+            Map<String, String> valuesMap = org.apache.commons.beanutils.BeanUtils.describe(spaceDocuments[i]);
+            if (i == 0) {
+                spaceEntry.setHeaderColumns(valuesMap.keySet());
+            }
+            spaceEntry.getTableData().add(
+                    valuesMap);
+        }
+        System.out.println(spaceEntry);
+        return spaceEntry;
     }
 
 }

@@ -44,6 +44,7 @@
     <orderEntry type="library" name="Maven: com.typesafe:config:1.2.1" level="project" />
     <orderEntry type="library" name="Maven: com.gigaspaces:gs-openspaces:lite-10.2" level="project" />
     <orderEntry type="library" name="Maven: com.gigaspaces:gs-runtime:lite-10.2" level="project" />
+    <orderEntry type="library" name="Maven: org.springframework:spring-test:4.2.5.RELEASE" level="project" />
     <orderEntry type="library" name="Maven: org.springframework:spring-aspects:4.2.5.RELEASE" level="project" />
     <orderEntry type="library" name="Maven: org.aspectj:aspectjweaver:1.8.8" level="project" />
     <orderEntry type="library" name="Maven: org.springframework:spring-tx:4.2.5.RELEASE" level="project" />
@@ -51,5 +52,17 @@
     <orderEntry type="library" name="Maven: com.fasterxml.jackson.core:jackson-core:2.4.1" level="project" />
     <orderEntry type="library" name="Maven: com.fasterxml.jackson.core:jackson-databind:2.4.1.1" level="project" />
     <orderEntry type="library" name="Maven: com.fasterxml.jackson.core:jackson-annotations:2.4.0" level="project" />
+    <orderEntry type="library" name="Maven: com.github.wnameless:json-flattener:0.1.6" level="project" />
+    <orderEntry type="library" name="Maven: com.eclipsesource.minimal-json:minimal-json:0.9.4" level="project" />
+    <orderEntry type="library" name="Maven: org.apache.commons:commons-lang3:3.4" level="project" />
+    <orderEntry type="library" name="Maven: commons-beanutils:commons-beanutils:1.9.2" level="project" />
+    <orderEntry type="library" name="Maven: commons-collections:commons-collections:3.2.1" level="project" />
+    <orderEntry type="library" name="Maven: com.google.guava:guava:18.0" level="project" />
+    <orderEntry type="library" name="Maven: org.eclipse.collections:eclipse-collections-api:7.1.0" level="project" />
+    <orderEntry type="library" name="Maven: net.jcip:jcip-annotations:1.0" level="project" />
+    <orderEntry type="library" name="Maven: org.eclipse.collections:eclipse-collections:7.1.0" level="project" />
+    <orderEntry type="library" name="Maven: org.springframework.integration:spring-integration-core:4.2.6.RELEASE" level="project" />
+    <orderEntry type="library" name="Maven: org.springframework.retry:spring-retry:1.1.2.RELEASE" level="project" />
+    <orderEntry type="library" name="Maven: org.springframework:spring-messaging:4.2.4.RELEASE" level="project" />
   </component>
 </module>
