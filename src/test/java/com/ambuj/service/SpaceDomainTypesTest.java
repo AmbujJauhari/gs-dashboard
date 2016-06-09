@@ -44,14 +44,14 @@ public class SpaceDomainTypesTest {
         for (Object spaceDocument : documents) {
             Field[] flds = spaceDocument.getClass().getDeclaredFields();
             List<Method> aClass = getAllGetters(spaceDocument.getClass());
-           ObjectToMapTransformer objectToMapTransformer = new ObjectToMapTransformer();
+            ObjectToMapTransformer objectToMapTransformer = new ObjectToMapTransformer();
 //
 
             Gson gson = new GsonBuilder().setPrettyPrinting().create();
             System.out.println(gson.toJson(spaceDocument));
 //
 //            Class aClass=        gigaSpace.getClass().getClassLoader().loadClass(dataType);
-           Map<String, Object> props = (Map<String, Object>) objectToMapTransformer.doTransform(new MutableMessage<Object>(spaceDocument));
+            Map<String, Object> props = (Map<String, Object>) objectToMapTransformer.doTransform(new MutableMessage<Object>(spaceDocument));
 //            GigaSpaceTypeManager gigaSpaceTypeManager = gigaSpace.getTypeManager();
 //            SpaceTypeDescriptor spaceTypeDescriptor = gigaSpaceTypeManager.getTypeDescriptor(dataType);
 //
@@ -62,7 +62,7 @@ public class SpaceDomainTypesTest {
 //
 //                System.out.println("\n");
 //            }
-          System.out.println(props);
+            System.out.println(props);
 
         }
     }

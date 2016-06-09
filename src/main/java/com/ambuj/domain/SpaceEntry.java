@@ -10,7 +10,16 @@ import java.util.Set;
  */
 public class SpaceEntry {
     private Set<String> headerColumns;
+    private String spaceIdHeaderName;
     private List<Map<String, String>> tableData = new ArrayList<>();
+
+    public String getSpaceIdHeaderName() {
+        return spaceIdHeaderName;
+    }
+
+    public void setSpaceIdHeaderName(String spaceIdHeaderName) {
+        this.spaceIdHeaderName = spaceIdHeaderName;
+    }
 
     public Set<String> getHeaderColumns() {
         return headerColumns;
@@ -32,6 +41,7 @@ public class SpaceEntry {
     public String toString() {
         return "SpaceEntry{" +
                 "headerColumns=" + headerColumns +
+                ", spaceIdHeaderName='" + spaceIdHeaderName + '\'' +
                 ", tableData=" + tableData +
                 '}';
     }
