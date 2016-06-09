@@ -10,6 +10,11 @@
         <link rel="stylesheet" href="https://rawgit.com/esvit/ng-table/master/dist/ng-table.min.css">
         <script src="https://rawgit.com/esvit/ng-table/master/dist/ng-table.min.js"></script>
     </head>
+    <script type="text/css">
+        .app-modal-window .modal-dialog {
+            width: 500px;
+        }
+    </script>
 
     <script type="text/javascript">
         angular.module('ui.bootstrap.demo', ['ngAnimate', 'ui.bootstrap', 'ngTable']);
@@ -24,7 +29,8 @@
             });
         }
 
-        angular.module('ui.bootstrap.demo').controller('queryController', function ($scope, $http, $filter, ngTableParams, $uibModal) {
+        angular.module('ui.bootstrap.demo').controller('queryController', function ($scope, $http, $filter, ngTableParams,
+                                                                                    $uibModal, $timeout, $log, $window) {
             $scope.submit = function () {
                 var queryFormData = {
                     "gridName": 'Grid-A',
@@ -34,6 +40,7 @@
                 $http.post('http://localhost:8080/query/getDataFromSpaceForType.html', queryFormData)
                         .success(function (data, status, headers, config) {
                             $scope.columns = data.headerColumns;
+                            $scope.spaceIdHeaderName = data.spaceIdHeaderName
                             $scope.documentDetailedData = data.tableData;
                             $scope.tableParams = new ngTableParams({
                                 page: 1,            // show first page
@@ -52,36 +59,77 @@
                         });
             };
 
-            $scope.items = ['item1', 'item2', 'item3'];
 
-            $scope.open = function () {
+            $scope.open = function (parameter1) {
 
                 var modalInstance = $uibModal.open({
                     templateUrl: 'myModalContent.html',
                     controller: ModalInstanceCtrl,
+                    size: 'lg',
                     resolve: {
                         items: function () {
-                            return $scope.items;
+                            return "loadind data..." + parameter1;
                         }
                     }
                 });
 
-                modalInstance.result.then(function (selectedItem) {
-                    $scope.selected = selectedItem;
+                modalInstance.opened.then(function () {
+                    $scope.loadData(modalInstance);
                 }, function () {
                     $log.info('Modal dismissed at: ' + new Date());
                 });
+
+                $scope.loadData = function (aModalInstance) {
+                    $timeout(function () {
+                        console.log($scope.selected);
+                        aModalInstance.setItems($scope.selected, parameter1, $scope.spaceIdHeaderName);
+                    }, 3000);
+                };
+
             };
 
             var ModalInstanceCtrl = function ($scope, $uibModalInstance, items) {
-
                 $scope.items = items;
-                $scope.selected = {
-                    item: $scope.items[0]
+                var datTypeDetails;
+                var spaceIdName;
+                $uibModalInstance.setItems = function (dataType, parameter1, spaceIdVarName) {
+                    spaceIdName = spaceIdVarName;
+                    datTypeDetails = dataType;
+                    $http.get("http://localhost:8080/query/getDataFromSpaceForTypeForSpaceId.html",
+                            {params: {"gridName": 'Grid-A', "dataType": dataType, "spaceId": parameter1}})
+                            .success(function (data) {
+                                var editableMap = [];
+                                for (var i in data) {
+                                    editableMap.push(
+                                            {
+                                                key: i,
+                                                value: data[i],
+                                                disabled: true
+                                            }
+                                    )
+                                }
+                                console.log(editableMap)
+                                $scope.items = editableMap;
+                            });
                 };
 
                 $scope.ok = function () {
-                    $uibModalInstance.close($scope.selected.item);
+                    for (var i in $scope.items) {
+                        $scope.items[i].disabled = false;
+                    }
+                    $scope.updateEnabled = true;
+                };
+
+                $scope.save = function () {
+                    console.log($scope.items);
+                    var dataForUpdating = {
+                        dataTypeName : datTypeDetails,
+                        dataHolderForType : $scope.items,
+                        spaceIdName : spaceIdName
+                    };
+                    $http.post("http://localhost:8080/query/saveDataInSpaceForTypeForSpaceId", dataForUpdating);
+                    $scope.updateEnabled = false;
+                   $uibModalInstance.close('close');
                 };
 
                 $scope.cancel = function () {
@@ -106,7 +154,7 @@
 
     <form class="form-inline" role="form" ng-controller="queryController" ng-submit="submit()">
         <div class="form-group">
-            <input type="text" placeholder="Document / Pojo name" ng-model="selected"
+            <input type="text" placeholder="Docum ent / Pojo name" ng-model="selected"
                    uib-typeahead="state for state in states | filter:$viewValue | limitTo:8"
                    class="form-control">
         </div>
@@ -136,26 +184,39 @@
                 <tbody>
                 <a href="#">
                     <tr ng-repeat="user in paginatedDocumentDetailedData">
-                        <td>
-                            <button class="btn" ng-click="open()">Open me!</button>
-                        </td>
                         <td ng-repeat="column in columns">
-                            {{user[column]}}
+                            <div class="animate-switch" ng-if="column == spaceIdHeaderName">
+                                <a href="" ng-click="open(user[column])"> {{user[column]}} </a></div>
+                            <div class="animate-switch" ng-if="column != spaceIdHeaderName">{{user[column]}}</div>
                         </td>
                         <script type="text/ng-template" id="myModalContent.html">
                             <div class="modal-header">
-                                <h3>I'm a modal!</h3>
+                                <h3>Detailed Query view for {{}} spaceId {{}}</h3>
                             </div>
                             <div class="modal-body">
-                                <ul>
-                                    <li ng-repeat="item in items">
-                                        <a ng-click="selected.item = item">{{ item }}</a>
-                                    </li>
-                                </ul>
-                                Selected: <b>{{ selected.item }}</b>
+                                <%--ForId: <b>{{items}}</b>--%>
+                                <table ng-table="tableParams" show-filter="true" class="table">
+                                    <thead>
+                                    <tr>
+                                        <th>Key</th>
+                                        <th>Value</th>
+                                    </tr>
+                                    </thead>
+                                    <tbody>
+                                    <tr ng-repeat="x in items">
+                                        <td>{{ x.key }}</td>
+                                        <td>
+                                            <div ng-show="x.disabled">{{x.value}}</div>
+                                            <div ng-hide="x.disabled"><input type="text" ng-model="x.value" /></div>
+
+                                            <%--<input type="text"--%>
+                                                   <%--ng-model="x.key" value={{x.value}} ng-disabled="x.disabled"/></td>--%>
+                                    </tr>
+                                </table>
                             </div>
                             <div class="modal-footer">
-                                <button class="btn btn-primary" ng-click="ok()">OK</button>
+                                <button class="btn btn-primary" ng-hide="updateEnabled" ng-click="ok()">Edit</button>
+                                <button class="btn btn-primary" ng-show="updateEnabled" ng-click="save()">Save</button>
                                 <button class="btn btn-warning" ng-click="cancel()">Cancel</button>
                             </div>
                         </script>
