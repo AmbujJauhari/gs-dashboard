@@ -3,7 +3,7 @@ package com.ambuj.domain;
 /**
  * Created by Aj on 09-06-2016.
  */
-public class DataHolderForType {
+public class DetailedDataEntry {
     private String key;
     private Object value;
     private boolean disabled;
@@ -34,7 +34,7 @@ public class DataHolderForType {
 
     @Override
     public String toString() {
-        return "DetailedQuerySaveHolder{" +
+        return "DetailedDataUpdateDto{" +
                 "key='" + key + '\'' +
                 ", value=" + value +
                 ", disabled=" + disabled +

@@ -37,11 +37,11 @@
                     "dataType": $scope.selected,
                     "criteria": $scope.queryCriteria
                 };
-                $http.post('http://localhost:8080/query/getDataFromSpaceForType.html', queryFormData)
+                $http.post('http://localhost:8080/query/getAllObjectsFromSpaceForTypeName.html', queryFormData)
                         .success(function (data, status, headers, config) {
-                            $scope.columns = data.headerColumns;
-                            $scope.spaceIdHeaderName = data.spaceIdHeaderName
-                            $scope.documentDetailedData = data.tableData;
+                            $scope.columns = data.fieldNames;
+                            $scope.spaceIdFieldName = data.spaceIdFieldName
+                            $scope.documentDetailedData = data.dataPerField;
                             $scope.tableParams = new ngTableParams({
                                 page: 1,            // show first page
                                 count: 10,          // count per page
@@ -82,7 +82,7 @@
                 $scope.loadData = function (aModalInstance) {
                     $timeout(function () {
                         console.log($scope.selected);
-                        aModalInstance.setItems($scope.selected, parameter1, $scope.spaceIdHeaderName);
+                        aModalInstance.setItems($scope.selected, parameter1, $scope.spaceIdFieldName);
                     }, 3000);
                 };
 
@@ -95,7 +95,7 @@
                 $uibModalInstance.setItems = function (dataType, parameter1, spaceIdVarName) {
                     spaceIdName = spaceIdVarName;
                     datTypeDetails = dataType;
-                    $http.get("http://localhost:8080/query/getDataFromSpaceForTypeForSpaceId.html",
+                    $http.get("http://localhost:8080/query/getDetailedDataFromSpaceForTypeNameWithSpaceId.html",
                             {params: {"gridName": 'Grid-A', "dataType": dataType, "spaceId": parameter1}})
                             .success(function (data) {
                                 var editableMap = [];
@@ -124,10 +124,10 @@
                     console.log($scope.items);
                     var dataForUpdating = {
                         dataTypeName : datTypeDetails,
-                        dataHolderForType : $scope.items,
+                        detailedDataEntry : $scope.items,
                         spaceIdName : spaceIdName
                     };
-                    $http.post("http://localhost:8080/query/saveDataInSpaceForTypeForSpaceId", dataForUpdating);
+                    $http.post("http://localhost:8080/query/updateDataInSpaceForTypeForSpaceId", dataForUpdating);
                     $scope.updateEnabled = false;
                    $uibModalInstance.close('close');
                 };
@@ -185,9 +185,9 @@
                 <a href="#">
                     <tr ng-repeat="user in paginatedDocumentDetailedData">
                         <td ng-repeat="column in columns">
-                            <div class="animate-switch" ng-if="column == spaceIdHeaderName">
+                            <div class="animate-switch" ng-if="column == spaceIdFieldName">
                                 <a href="" ng-click="open(user[column])"> {{user[column]}} </a></div>
-                            <div class="animate-switch" ng-if="column != spaceIdHeaderName">{{user[column]}}</div>
+                            <div class="animate-switch" ng-if="column != spaceIdFieldName">{{user[column]}}</div>
                         </td>
                         <script type="text/ng-template" id="myModalContent.html">
                             <div class="modal-header">

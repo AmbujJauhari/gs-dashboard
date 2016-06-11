@@ -1,12 +1,7 @@
 package com.ambuj.service;
 
-import org.junit.Test;
 import org.openspaces.core.cluster.ClusterInfo;
 import org.openspaces.pu.container.standalone.StandaloneProcessingUnitContainerProvider;
-
-import java.io.File;
-
-import static org.junit.Assert.*;
 
 
 public class SpaceDiscoveryServiceIntegrationTest {

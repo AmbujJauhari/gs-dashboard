@@ -1,62 +1,64 @@
 package com.ambuj.controller;
 
-import com.ambuj.domain.*;
-import com.ambuj.service.GsSpaceQueryService;
+import com.ambuj.domain.DataRequestForTypeName;
+import com.ambuj.domain.DetailedDataUpdateDto;
+import com.ambuj.domain.EntriesForTypeName;
+import com.ambuj.domain.SpaceLookUpDetails;
+import com.ambuj.service.SpaceAccessorService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.ArrayList;
+import java.rmi.RemoteException;
 import java.util.List;
 import java.util.Map;
+
+import static org.apache.commons.beanutils.BeanUtils.describe;
 
 @Controller
 public class QueryController {
     @Autowired
-    private GsSpaceQueryService gsSpaceQueryService;
+    private SpaceAccessorService spaceAccessorService;
 
     @RequestMapping(value = "query/queryboard", method = RequestMethod.GET)
-    public String queryboard() {
+    public String queryBoard() {
         return "query/queryboard";
     }
 
-    @RequestMapping(value = "query/getAllDocumentTypesForSpace", headers = "Accept=*/*")
+    @RequestMapping(value = "query/getAllDocumentTypesForSpace")
     public
     @ResponseBody
-    List<String> getAllDocumentTypesForSpace(@RequestParam String envName) {
-        GsLookUpDetails gsLookUpDetails = new GsLookUpDetails.GsLookUpDetailsBuilder().withEnvName(envName).build();
-        return gsSpaceQueryService.getAllDataTypesForSpace(gsLookUpDetails);
+    List<String> getAllDocumentTypesForSpace(@RequestParam String envName) throws RemoteException {
+        SpaceLookUpDetails spaceLookUpDetails = new SpaceLookUpDetails.SpaceLookUpDetailsBuilder().withEnvName(envName).build();
+        return spaceAccessorService.getAllDataTypesForSpace(spaceLookUpDetails);
     }
 
-    @RequestMapping(value = "query/getDataFromSpaceForType", headers = "Accept=*/*", method = RequestMethod.POST)
+    @RequestMapping(value = "query/getDataFromSpaceForType", headers = "Accept=*/*", method = RequestMethod.POST, produces = "application/json")
     public
     @ResponseBody
-    SpaceEntry getDataFromSpaceForType(@RequestBody SpaceQueryRestRequest spaceQueryRestRequest) throws Exception {
-        String documentName = spaceQueryRestRequest.getDataType();
-        String criteria = spaceQueryRestRequest.getCriteria();
-        String envName = spaceQueryRestRequest.getGridName();
-        Object[] spaceDocuments = gsSpaceQueryService.getDataFromSpaceForType(envName, documentName, criteria);
-        SpaceEntry spaceEntry = new SpaceEntry();
-        for (int i = 0; i < spaceDocuments.length; i++) {
-            Map<String, String> valuesMap = org.apache.commons.beanutils.BeanUtils.describe(spaceDocuments[i]);
+    EntriesForTypeName getDataFromSpaceForType(@RequestBody DataRequestForTypeName dataRequestForTypeName) throws Exception {
+        String documentName = dataRequestForTypeName.getDataType();
+        String criteria = dataRequestForTypeName.getCriteria();
+        String envName = dataRequestForTypeName.getGridName();
+        Object[] allEntriesOfTypeName = spaceAccessorService.getAllObjectsFromSpaceForTypeName(envName, documentName, criteria);
+        EntriesForTypeName entriesForTypeName = new EntriesForTypeName();
+        for (int i = 0; i < allEntriesOfTypeName.length; i++) {
+            Map<String, String> valuesMap = describe(allEntriesOfTypeName[i]);
             if (i == 0) {
-                spaceEntry.setHeaderColumns(valuesMap.keySet());
-                spaceEntry.setSpaceIdHeaderName(gsSpaceQueryService.getSpaceIdFieldNameForType(envName, documentName));
+                entriesForTypeName.setFieldNames(valuesMap.keySet());
+                entriesForTypeName.setSpaceIdFieldName(spaceAccessorService.getSpaceIdFieldNameForType(envName, documentName));
             }
-            spaceEntry.getTableData().add(
-                    valuesMap);
+            entriesForTypeName.getDataPerField().add(valuesMap);
         }
-        System.out.println(spaceEntry);
-        return spaceEntry;
+        return entriesForTypeName;
     }
 
-    @RequestMapping(value = "query/saveDataInSpaceForTypeForSpaceId", headers = "Accept=*/*", method = RequestMethod.POST)
+    @RequestMapping(value = "query/updateDataInSpaceForTypeForSpaceId", headers = "Accept=*/*", method = RequestMethod.POST)
     public
     @ResponseBody
-    SpaceEntry saveDataInSpaceForTypeForSpaceId(@RequestBody DetailedQuerySaveHolder detailedQuerySaveHolder) throws Exception {
-        gsSpaceQueryService.updataDataForSpaceTypeSpaceId("Grid-A", detailedQuerySaveHolder.getDataTypeName(),
-                detailedQuerySaveHolder.getSpaceIdName(), detailedQuerySaveHolder.getDataHolderForType());
-        return null;
+    void updateDataInSpaceForTypeForSpaceId(@RequestBody DetailedDataUpdateDto detailedDataUpdateDto) throws Exception {
+        spaceAccessorService.updateDataForTypeNameWithSpaceId("Grid-A", detailedDataUpdateDto.getDataTypeName(),
+                detailedDataUpdateDto.getSpaceIdName(), detailedDataUpdateDto.getDetailedDataEntry());
     }
 
     @RequestMapping(value = "query/getDataFromSpaceForTypeForSpaceId", method = RequestMethod.GET)
@@ -65,16 +67,14 @@ public class QueryController {
     Map<String, Object> getDataFromSpaceForTypeForSpaceId(@RequestParam String spaceId,
                                                           @RequestParam String dataType,
                                                           @RequestParam String gridName) throws Exception {
-        Map<String, Object> flattenedObject = gsSpaceQueryService.getDataFromSpaceForTypeForSpaceId(gridName, dataType, spaceId);
-        List<DetailedSpaceEntry> detailedSpaceEntries = new ArrayList<>();
-        for (String key : flattenedObject.keySet()) {
-            DetailedSpaceEntry detailedSpaceEntry = new DetailedSpaceEntry();
-            detailedSpaceEntry.setKey(key);
-            detailedSpaceEntry.setValue(flattenedObject.get(key));
-            detailedSpaceEntries.add(detailedSpaceEntry);
-        }
-        System.out.println(detailedSpaceEntries);
-        return flattenedObject;
+        return spaceAccessorService.getDetailedDataFromSpaceForTypeNameWithSpaceId(gridName, dataType, spaceId);
     }
 
+    public SpaceAccessorService getSpaceAccessorService() {
+        return spaceAccessorService;
+    }
+
+    public void setSpaceAccessorService(SpaceAccessorService spaceAccessorService) {
+        this.spaceAccessorService = spaceAccessorService;
+    }
 }

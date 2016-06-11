@@ -3,7 +3,7 @@ package com.ambuj.domain;
 /**
  * Created by Aj on 02-06-2016.
  */
-public class SpaceQueryRestRequest {
+public class DataRequestForTypeName {
     private String gridName;
     private String dataType;
     private String criteria;

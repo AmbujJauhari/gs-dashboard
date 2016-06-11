@@ -1,6 +1,6 @@
 package com.ambuj.controller;
 
-import com.ambuj.service.SpaceDiscoveryService;
+import com.ambuj.service.SpaceLookUpService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -11,13 +11,13 @@ import org.springframework.web.servlet.ModelAndView;
 public class HellowWorldController {
 
     @Autowired
-    private SpaceDiscoveryService spaceDiscoveryService;
+    private SpaceLookUpService spaceLookUpService;
 
 
     @RequestMapping("/index")
     public ModelAndView helloWorld() {
         ModelAndView gsEnvironmentList = new ModelAndView("index");
-        gsEnvironmentList.addObject("gsEnvList", spaceDiscoveryService.gsLookUpDetails());
+        gsEnvironmentList.addObject("gsEnvList", spaceLookUpService.gsLookUpDetails());
         return gsEnvironmentList;
     }
 

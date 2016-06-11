@@ -5,10 +5,10 @@ import java.util.Arrays;
 /**
  * Created by Aj on 09-06-2016.
  */
-public class DetailedQuerySaveHolder {
+public class DetailedDataUpdateDto {
     private String dataTypeName;
     private String spaceIdName;
-    private DataHolderForType[] dataHolderForType;
+    private DetailedDataEntry[] detailedDataEntry;
 
     public String getDataTypeName() {
         return dataTypeName;
@@ -18,12 +18,12 @@ public class DetailedQuerySaveHolder {
         this.dataTypeName = dataTypeName;
     }
 
-    public DataHolderForType[] getDataHolderForType() {
-        return dataHolderForType;
+    public DetailedDataEntry[] getDetailedDataEntry() {
+        return detailedDataEntry;
     }
 
-    public void setDataHolderForType(DataHolderForType[] dataHolderForType) {
-        this.dataHolderForType = dataHolderForType;
+    public void setDetailedDataEntry(DetailedDataEntry[] detailedDataEntry) {
+        this.detailedDataEntry = detailedDataEntry;
     }
 
     public String getSpaceIdName() {
@@ -36,10 +36,10 @@ public class DetailedQuerySaveHolder {
 
     @Override
     public String toString() {
-        return "DetailedQuerySaveHolder{" +
+        return "DetailedDataUpdateDto{" +
                 "dataTypeName='" + dataTypeName + '\'' +
                 ", spaceIdName='" + spaceIdName + '\'' +
-                ", dataHolderForType=" + Arrays.toString(dataHolderForType) +
+                ", detailedDataEntry=" + Arrays.toString(detailedDataEntry) +
                 '}';
     }
 }

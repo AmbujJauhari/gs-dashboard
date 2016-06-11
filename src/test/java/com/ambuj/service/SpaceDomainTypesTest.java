@@ -4,7 +4,6 @@ import com.gigaspaces.document.SpaceDocument;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.j_spaces.core.client.SQLQuery;
-import org.junit.Test;
 import org.openspaces.core.GigaSpace;
 import org.openspaces.core.GigaSpaceConfigurer;
 import org.openspaces.core.space.UrlSpaceConfigurer;
@@ -29,7 +28,7 @@ import java.util.stream.Collectors;
 public class SpaceDomainTypesTest {
 
 
-    @Test
+    //@Test
     public void testControllerForTypes() throws Exception {
         UrlSpaceConfigurer urlSpaceConfigurer = new UrlSpaceConfigurer("jini://*/*/processorSpace");
         GigaSpace gigaSpace = new GigaSpaceConfigurer(urlSpaceConfigurer).gigaSpace();
